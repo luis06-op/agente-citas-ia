@@ -1,5 +1,14 @@
 # Resultado de las pruebas reales
 
+> **Actualización (24/11/2026, commit `9e89127`):** se añadió un guardia en
+> `src/agente.js` que evita repetir una misma herramienta con idénticos
+> argumentos y limita las herramientas por turno. Una nueva comprobación con
+> cuatro de los escenarios anteriores terminó los bucles: `ocupado` y
+> `cancelar-correo-distinto` pasaron los controles; `reserva-completa` y
+> `solo-consultar` siguen fallando por interpretación del modelo pequeño
+> (hora/correo inventados y consulta sin llamada a herramienta). Los números de
+> este documento corresponden a la ejecución original, anterior al guardia.
+
 ## Conclusión
 
 **La versión actual no supera la verificación de conversaciones reales.**
