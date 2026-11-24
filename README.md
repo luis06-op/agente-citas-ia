@@ -1,4 +1,4 @@
-![Banner del proyecto](assets/banner.png)
+![Banner animado del proyecto](assets/banner.gif)
 
 # Agente de citas con IA local gratuita
 
@@ -135,4 +135,5 @@ el texto de la conversación. Las respuestas pueden variar entre ejecuciones.
 - `scripts/local.js`: selección del motor; scripts Bash para instalar y arrancar.
 - `test/`: pruebas de agenda y del ciclo del agente con cliente simulado.
 - `verificacion/real.js`: conversaciones contra el modelo real, con reloj y agenda aislados.
-- `assets/banner.svg` y `assets/banner.png`: banner del proyecto (fuente y PNG 1600×400).
+- `assets/banner.gif`: banner animado (escritura en la terminal, cursor y halo pulsante).
+- `assets/banner.svg` y `assets/banner.png`: fuente editable y versión estática (1600×400).
