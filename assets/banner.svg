@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="400" viewBox="0 0 1600 400" role="img" aria-label="Agente de IA en JavaScript — agenda de citas con IA local gratuita">
+  <defs>
+    <linearGradient id="fondo" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#070b18"/>
+      <stop offset="55%" stop-color="#0d1530"/>
+      <stop offset="100%" stop-color="#0a1f2b"/>
+    </linearGradient>
+    <linearGradient id="brillo" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#a3ff12"/>
+      <stop offset="100%" stop-color="#38e8ff"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#162545"/>
+      <stop offset="100%" stop-color="#0d1730"/>
+    </linearGradient>
+    <pattern id="rejilla" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#5ce1ff" stroke-opacity="0.08" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="halo">
+      <stop offset="0%" stop-color="#38e8ff" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#38e8ff" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="suave" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+  </defs>
+
+  <!-- Fondo -->
+  <rect width="1600" height="400" fill="url(#fondo)"/>
+  <rect width="1600" height="400" fill="url(#rejilla)"/>
+  <circle cx="330" cy="200" r="230" fill="url(#halo)"/>
+  <circle cx="1390" cy="330" r="180" fill="url(#halo)"/>
+  <path d="M0 396H1600" stroke="url(#brillo)" stroke-width="4"/>
+
+  <!-- Ilustración: robot -->
+  <g transform="translate(120 92)">
+    <rect x="70" y="-46" width="8" height="40" rx="4" fill="#38e8ff" opacity="0.8"/>
+    <circle cx="74" cy="-52" r="10" fill="#a3ff12"/>
+    <rect x="2" y="0" width="148" height="112" rx="26" fill="url(#panel)" stroke="#38e8ff" stroke-opacity="0.55" stroke-width="2"/>
+    <rect x="18" y="18" width="116" height="56" rx="16" fill="#060c1c" stroke="#a3ff12" stroke-opacity="0.35"/>
+    <circle cx="50" cy="46" r="9" fill="#a3ff12"/>
+    <circle cx="102" cy="46" r="9" fill="#a3ff12"/>
+    <path d="M58 80h34" stroke="#38e8ff" stroke-width="4" stroke-linecap="round"/>
+    <rect x="40" y="124" width="72" height="10" rx="5" fill="#38e8ff" opacity="0.35"/>
+    <rect x="56" y="142" width="40" height="8" rx="4" fill="#38e8ff" opacity="0.18"/>
+  </g>
+
+  <!-- Conexión -->
+  <path d="M300 205 C355 205 360 150 415 150" fill="none" stroke="url(#brillo)" stroke-width="2" stroke-dasharray="7 7" opacity="0.8"/>
+  <circle cx="300" cy="205" r="5" fill="#a3ff12"/>
+  <circle cx="415" cy="150" r="5" fill="#38e8ff"/>
+
+  <!-- Ilustración: calendario -->
+  <g transform="translate(420 96)">
+    <rect x="0" y="0" width="186" height="172" rx="20" fill="url(#panel)" stroke="#38e8ff" stroke-opacity="0.45" stroke-width="2"/>
+    <rect x="0" y="0" width="186" height="40" rx="20" fill="#a3ff12" opacity="0.92"/>
+    <rect x="0" y="26" width="186" height="14" fill="#a3ff12" opacity="0.92"/>
+    <text x="18" y="28" font-family="DejaVu Sans, sans-serif" font-size="17" font-weight="bold" fill="#08111d">CITAS · 2026</text>
+    <g fill="#5ce1ff" opacity="0.65">
+      <circle cx="30" cy="72" r="6"/><circle cx="62" cy="72" r="6"/><circle cx="94" cy="72" r="6"/><circle cx="126" cy="72" r="6"/><circle cx="158" cy="72" r="6"/>
+      <circle cx="30" cy="104" r="6"/><circle cx="62" cy="104" r="6"/><circle cx="126" cy="104" r="6"/><circle cx="158" cy="104" r="6"/>
+      <circle cx="30" cy="136" r="6"/><circle cx="62" cy="136" r="6"/><circle cx="94" cy="136" r="6"/><circle cx="126" cy="136" r="6"/><circle cx="158" cy="136" r="6"/>
+    </g>
+    <circle cx="94" cy="104" r="19" fill="#a3ff12"/>
+    <path d="M85 104l6 6 12-13" fill="none" stroke="#08111d" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Texto -->
+  <g font-family="DejaVu Sans, sans-serif">
+    <text x="720" y="142" font-size="74" font-weight="bold" fill="#ffffff" letter-spacing="1">AGENTE DE IA</text>
+    <text x="720" y="226" font-size="74" font-weight="bold" fill="url(#brillo)" letter-spacing="1">EN JAVASCRIPT</text>
+    <text x="724" y="276" font-size="20" fill="#b9c9e6" letter-spacing="1.2">CITAS DESDE LA TERMINAL · IA LOCAL GRATUITA · SIN API KEY</text>
+
+    <g font-size="17" font-weight="bold" letter-spacing="0.5">
+      <rect x="720" y="308" width="166" height="40" rx="20" fill="#a3ff12" fill-opacity="0.12" stroke="#a3ff12" stroke-opacity="0.5"/>
+      <circle cx="742" cy="328" r="5" fill="#a3ff12"/>
+      <text x="758" y="334" fill="#a3ff12">NODE.JS 22+</text>
+
+      <rect x="898" y="308" width="150" height="40" rx="20" fill="#38e8ff" fill-opacity="0.10" stroke="#38e8ff" stroke-opacity="0.5"/>
+      <circle cx="920" cy="328" r="5" fill="#38e8ff"/>
+      <text x="936" y="334" fill="#7ceeff">QWEN 2.5</text>
+
+      <rect x="1060" y="308" width="166" height="40" rx="20" fill="#38e8ff" fill-opacity="0.10" stroke="#38e8ff" stroke-opacity="0.5"/>
+      <circle cx="1082" cy="328" r="5" fill="#38e8ff"/>
+      <text x="1098" y="334" fill="#7ceeff">LLAMA.CPP</text>
+    </g>
+  </g>
+</svg>

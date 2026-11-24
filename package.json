@@ -1,0 +1,27 @@
+{
+  "name": "agente-citas-ia",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agente de IA para agendar citas desde la terminal, construido desde cero en JavaScript",
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "prestart": "node scripts/local.js auto",
+    "start": "node index.js",
+    "preparar": "node scripts/local.js preparar",
+    "local:iniciar": "node scripts/local.js iniciar",
+    "local:estado": "node scripts/local.js estado",
+    "local:detener": "node scripts/local.js detener",
+    "ollama:iniciar": "bash scripts/ollama.sh iniciar",
+    "ollama:estado": "bash scripts/ollama.sh estado",
+    "ollama:detener": "bash scripts/ollama.sh detener",
+    "test": "node --test",
+    "test:real": "node verificacion/real.js"
+  },
+  "dependencies": {
+    "openai": "^7.63.0"
+  }
+}
