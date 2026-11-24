@@ -64,6 +64,7 @@ function normalizarArgumentos(argumentos, parametros) {
  * @param {Array<{nombre: string, descripcion: string, parametros: Array<{nombre: string, tipo: string, descripcion: string}>, ejecutar: (args: any) => Promise<any>}>} opciones.herramientas
  * @param {string} opciones.promptSistema
  * @param {number} [opciones.maxPasos]
+ * @param {number} [opciones.maxHerramientas]
  * @param {number} [opciones.temperature]
  * @param {boolean} [opciones.jsonMode]
  * @param {(mensaje: string) => void} [opciones.registrar]
@@ -74,6 +75,7 @@ export function crearAgente({
     herramientas,
     promptSistema,
     maxPasos = 8,
+    maxHerramientas = 4,
     temperature = 0.2,
     jsonMode = true,
     registrar = () => {}
@@ -127,6 +129,52 @@ export function crearAgente({
     }
 
     /**
+     * Normaliza los argumentos del modelo antes de ejecutar o comparar una llamada.
+     * @param {any} llamada
+     * @returns {{ herramienta: any, argumentos: Record<string, unknown> } | { error: string }}
+     */
+    function prepararLlamada(llamada) {
+        const nombre = llamada?.function;
+        const herramienta = porNombre.get(nombre);
+        if (!herramienta) {
+            return { error: `Función desconocida: ${String(nombre)}` };
+        }
+
+        const argumentos = normalizarArgumentos(llamada.arguments, herramienta.parametros);
+        const faltantes = herramienta.parametros
+            .filter((parametro) => argumentos[parametro.nombre] === undefined || argumentos[parametro.nombre] === '')
+            .map((parametro) => parametro.nombre);
+
+        if (faltantes.length > 0) {
+            return { error: `Faltan argumentos obligatorios: ${faltantes.join(', ')}.` };
+        }
+
+        return { herramienta, argumentos };
+    }
+
+    /** Identifica una llamada repetida sin depender del orden de las claves JSON. */
+    function firmaDe(nombre, argumentos) {
+        const pares = Object.keys(argumentos)
+            .sort()
+            .map((clave) => [clave, argumentos[clave]]);
+        return `${nombre}|${JSON.stringify(pares)}`;
+    }
+
+    /** Convierte el último resultado de herramienta en un mensaje para la persona. */
+    function resumirResultado(resultado) {
+        if (!resultado) {
+            return 'No pude completar la solicitud. Inténtalo de nuevo con más detalles.';
+        }
+        if (resultado.ok === false) {
+            return `No pude completar la solicitud: ${resultado.error ?? 'error desconocido'}`;
+        }
+        if (typeof resultado.mensaje === 'string' && resultado.mensaje !== '') {
+            return resultado.mensaje;
+        }
+        return `Listo. ${JSON.stringify(resultado)}`;
+    }
+
+    /**
      * Procesa un turno completo: añade el mensaje de la persona, llama al modelo
      * tantas veces como haga falta y devuelve la respuesta final para el usuario.
      * @param {string} textoUsuario
@@ -134,6 +182,11 @@ export function crearAgente({
      */
     async function responder(textoUsuario) {
         mensajes.push({ role: 'user', content: textoUsuario });
+
+        /** @type {Map<string, { veces: number, resultado: any }>} */
+        const ejecutadas = new Map();
+        let herramientasUsadas = 0;
+        let ultimoResultado = null;
 
         for (let paso = 0; paso < maxPasos; paso++) {
             const contenido = await llamarModelo();
@@ -168,7 +221,39 @@ export function crearAgente({
                     continue;
                 }
 
+                const preparada = prepararLlamada(llamada);
+                if ('error' in preparada) {
+                    responderAlSistema(`[sistema] ${preparada.error}`);
+                    continue;
+                }
+
+                const firma = firmaDe(llamada.function, preparada.argumentos);
+                const anterior = ejecutadas.get(firma);
+
+                if (anterior) {
+                    anterior.veces += 1;
+                    if (anterior.veces >= 3 || herramientasUsadas >= maxHerramientas) {
+                        registrar(`  [herramienta] ${llamada.function} → repetida, se devuelve el resultado al usuario`);
+                        return resumirResultado(anterior.resultado);
+                    }
+                    responderAlSistema(
+                        `[sistema] Ya ejecutaste ${llamada.function} con exactamente estos argumentos ` +
+                            `y el resultado fue: ${JSON.stringify(anterior.resultado)}. ` +
+                            'No repitas la misma llamada: explica ese resultado a la persona con ' +
+                            '{"to":"user","message":"..."} o prueba otra acción con argumentos distintos.'
+                    );
+                    continue;
+                }
+
+                if (herramientasUsadas >= maxHerramientas) {
+                    registrar('  [herramienta] límite de herramientas por turno alcanzado');
+                    return resumirResultado(ultimoResultado);
+                }
+
                 const resultado = await ejecutarHerramienta(llamada);
+                herramientasUsadas += 1;
+                ultimoResultado = resultado;
+                ejecutadas.set(firma, { veces: 1, resultado });
                 const estado = resultado.ok === false ? 'error' : 'ok';
                 registrar(
                     `  [herramienta] ${llamada.function}(${JSON.stringify(llamada.arguments ?? {})}) → ${estado}`

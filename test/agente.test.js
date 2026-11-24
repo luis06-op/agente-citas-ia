@@ -178,4 +178,90 @@ test('el prompt describe las funciones y el horario', async (t) => {
     assert.match(promptSistema, /cancelar_cita/);
     assert.match(promptSistema, /lunes a viernes/);
     assert.match(promptSistema, /America\/Bogota/);
+    assert.match(promptSistema, /No repitas una función/);
+});
+
+test('no vuelve a ejecutar una herramienta con los mismos argumentos', async (t) => {
+    const { herramientas, promptSistema } = await preparar(t);
+    const ejecuciones = [];
+    const herramientasVigiladas = herramientas.map((herramienta) => ({
+        ...herramienta,
+        ejecutar: (argumentos) => {
+            ejecuciones.push(argumentos);
+            return herramienta.ejecutar(argumentos);
+        }
+    }));
+    const llamada = JSON.stringify({
+        to: 'system',
+        function_call: {
+            function: 'consultar_disponibilidad',
+            arguments: { fecha_hora: '2026-11-25T15:00:00Z' }
+        }
+    });
+    const cliente = crearClienteFalso([
+        llamada,
+        llamada,
+        JSON.stringify({ to: 'user', message: 'Sí, hay disponibilidad.' })
+    ]);
+    const agente = crearAgente({ cliente, modelo: 'falso', herramientas: herramientasVigiladas, promptSistema });
+
+    const respuesta = await agente.responder('¿Hay cita el miércoles a las 10?');
+
+    assert.equal(respuesta, 'Sí, hay disponibilidad.');
+    assert.equal(ejecuciones.length, 1);
+    assert.match(cliente.llamadas[2].messages.at(-1).content, /Ya ejecutaste consultar_disponibilidad/);
+    assert.match(cliente.llamadas[2].messages.at(-1).content, /No repitas la misma llamada/);
+});
+
+test('devuelve el resultado al usuario si el modelo insiste en repetir', async (t) => {
+    const { herramientas, promptSistema } = await preparar(t);
+    let ejecuciones = 0;
+    const herramientasVigiladas = herramientas.map((herramienta) => ({
+        ...herramienta,
+        ejecutar: (argumentos) => {
+            ejecuciones += 1;
+            return herramienta.ejecutar(argumentos);
+        }
+    }));
+    const llamada = JSON.stringify({
+        to: 'system',
+        function_call: {
+            function: 'consultar_disponibilidad',
+            arguments: { fecha_hora: '2026-11-25T15:00:00Z' }
+        }
+    });
+    const cliente = crearClienteFalso([llamada, llamada, llamada, llamada, llamada]);
+    const agente = crearAgente({ cliente, modelo: 'falso', herramientas: herramientasVigiladas, promptSistema });
+
+    const respuesta = await agente.responder('¿Hay cita el miércoles a las 10?');
+
+    assert.equal(ejecuciones, 1);
+    assert.match(respuesta, /Hay disponibilidad el miércoles/);
+});
+
+test('limita el número de herramientas por turno', async (t) => {
+    const { herramientas, promptSistema } = await preparar(t);
+    let ejecuciones = 0;
+    const herramientasVigiladas = herramientas.map((herramienta) => ({
+        ...herramienta,
+        ejecutar: (argumentos) => {
+            ejecuciones += 1;
+            return herramienta.ejecutar(argumentos);
+        }
+    }));
+    const consulta = (hora) => JSON.stringify({
+        to: 'system',
+        function_call: {
+            function: 'consultar_disponibilidad',
+            arguments: { fecha_hora: `2026-11-25T${hora}:00:00Z` }
+        }
+    });
+    const cliente = crearClienteFalso([consulta('15'), consulta('16'), consulta('17'), consulta('18'), consulta('19')]);
+    const agente = crearAgente({ cliente, modelo: 'falso', herramientas: herramientasVigiladas, promptSistema });
+
+    const respuesta = await agente.responder('¿Qué horas hay libres?');
+
+    assert.equal(ejecuciones, 4);
+    assert.equal(cliente.llamadas.length, 5);
+    assert.match(respuesta, /Hay disponibilidad/);
 });

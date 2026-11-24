@@ -127,7 +127,7 @@ el texto de la conversación. Las respuestas pueden variar entre ejecuciones.
 ## Código
 
 - `index.js`: configuración, comprobación del servidor y terminal.
-- `src/agente.js`: historial, protocolo JSON y límite de ocho pasos por turno.
+- `src/agente.js`: historial, protocolo JSON, límite de ocho pasos por turno y guardia contra llamadas repetidas a una misma herramienta.
 - `src/citas.js`: validación, disponibilidad y persistencia.
 - `src/herramientas.js`: funciones disponibles para el modelo.
 - `src/prompt.js`: instrucciones del agente.
